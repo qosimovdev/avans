@@ -104,8 +104,8 @@ Render API**, so the session cookie is first-party and `COOKIE_SAMESITE=lax` wor
    - `CORS_ORIGIN` = your Vercel URL, e.g. `https://ish-haqqi.vercel.app`
    - `ADMIN_USERNAME` / `ADMIN_PASSWORD` for the first start (then delete them), or run
      `npm run admin:create:prod -- admin` from the Render shell (prompts for the password).
-2. **Vercel** — import the repository, Root Directory `client`, framework Vite. In `client/vercel.json` replace
-   `REPLACE-WITH-BACKEND-HOST` with the Render host (e.g. `ish-haqqi-api.onrender.com`) and commit. Leave
+2. **Vercel** — import the repository, Root Directory `client`, framework Vite. `client/vercel.json` rewrites `/api/*` to
+   `https://ish-haqqi-api.onrender.com`; change that host if your Render service URL differs. Leave
    `VITE_API_URL` empty.
 3. Verify: `https://<render-host>/api/health` returns `{"status":"ok",...}`, then open the Vercel URL and log in.
 
