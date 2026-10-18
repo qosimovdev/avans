@@ -1,0 +1,63 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique @db.VarChar(100)
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Employee {
+  id                  Int             @id @default(autoincrement())
+  fullName            String          @db.VarChar(150)
+  phone               String?         @db.VarChar(30)
+  position            String?         @db.VarChar(100)
+  employmentStartDate DateTime        @db.Date
+  isActive            Boolean         @default(true)
+  notes               String?         @db.VarChar(1000)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  salaryHistory       SalaryHistory[]
+  advances            Advance[]
+
+  @@index([isActive])
+  @@index([fullName])
+}
+
+/// Salary periods use whole months. effectiveFrom is always the first day of a
+/// month; effectiveTo is the last day of the period (null = still in effect).
+model SalaryHistory {
+  id            Int       @id @default(autoincrement())
+  employeeId    Int
+  monthlySalary Int
+  effectiveFrom DateTime  @db.Date
+  effectiveTo   DateTime? @db.Date
+  createdAt     DateTime  @default(now())
+  employee      Employee  @relation(fields: [employeeId], references: [id], onDelete: Restrict)
+
+  @@unique([employeeId, effectiveFrom])
+  @@index([employeeId, effectiveFrom])
+}
+
+model Advance {
+  id         Int      @id @default(autoincrement())
+  employeeId Int
+  amount     Int
+  date       DateTime @db.Date
+  note       String?  @db.VarChar(500)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Restrict)
+
+  @@index([date])
+  @@index([employeeId, date])
+}
